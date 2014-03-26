@@ -1,0 +1,49 @@
+#!/usr/local/var/rbenv/shims/ruby
+
+def print_usage
+  puts ""
+  puts "File counter version 1.0"
+  puts "Usage:"
+  puts "file_count [dir]"
+  puts ""
+end
+
+def print_version
+  puts ""
+  puts "File counter version 1.0"
+  puts "Copyright (c) Jeff McFadden"
+  puts ""
+end
+
+if ['-v', '--version'].include?( ARGF.argv[0].to_s.downcase )
+  print_version
+  exit 0
+elsif ['-h', '--help'].include?( ARGF.argv[0].to_s.downcase )
+  print_usage
+  exit 0
+end
+
+map = {}
+
+dir = ARGF.argv[0].to_s
+
+if dir[-1, 1] != '/'
+  dir += '/'
+end
+
+Dir.foreach( dir ) do |item|
+  next if item == '.' or item == '..'
+  map[item] = `find "#{dir}#{item}" -type f -print | wc -l`.strip
+end
+
+puts ""
+puts "Items".rjust(10) + " | " + " Folder "
+
+map.each do |k,v|
+  puts v.to_s.rjust(10) + " | " + k
+end
+
+total = map.values.collect{ |x| x.to_i }.inject(:+)
+
+puts ( "-" * 80 )
+puts total.to_s.rjust( 10 ) + " | " + "Total "
